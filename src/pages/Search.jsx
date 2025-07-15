@@ -11,6 +11,7 @@ import {
   Card,
 } from "react-bootstrap";
 import { FaSearch, FaTimesCircle } from "react-icons/fa";
+import PageTransition from "../components/PageTransition";
 
 export default function Search() {
   const [filters, setFilters] = useState({
@@ -27,21 +28,16 @@ export default function Search() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState([]);
   const [showModal, setShowModal] = useState(false);
-
   const { user } = useAuth();
   const isPremium = user?.plan === "premium" || user?.role === "admin";
 
   const handleChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value,
-    });
+    setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-
-    const mockResult = [
+    setResults([
       {
         id: 1,
         brand: filters.brand || "Rolex",
@@ -52,31 +48,30 @@ export default function Search() {
         year: filters.year || "2022",
         price: "$12,800",
       },
-    ];
-    setResults(mockResult);
+    ]);
     setShowModal(true);
   };
 
   return (
-    <>
+    <PageTransition>
       <Helmet>
         <title>Search Watches - Rollie</title>
       </Helmet>
 
       <Container className="mt-4">
         <div className="text-center mb-4">
-          <h2>Search Luxury Watches</h2>
+          <h2 className="fw-semibold">Explore the Market</h2>
           <p className="text-muted small">
-            Find the latest prices and details for high-end timepieces.
+            Find accurate prices and specs for luxury timepieces.
           </p>
         </div>
 
         <Form onSubmit={handleSearch}>
-          <Card className="p-4 shadow-sm mb-4">
+          <Card className="p-4 shadow-sm border-0">
             <Row className="g-3 align-items-end">
               <Col md={6}>
                 <Form.Group controlId="reference">
-                  <Form.Label>Reference</Form.Label>
+                  <Form.Label>Reference Number</Form.Label>
                   <Form.Control
                     type="text"
                     name="reference"
@@ -86,11 +81,10 @@ export default function Search() {
                   />
                 </Form.Group>
               </Col>
-
               <Col md={6} className="d-flex justify-content-end">
                 {isPremium && (
                   <Button
-                    variant="outline-dark"
+                    variant="outline-secondary"
                     className="me-2"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                   >
@@ -100,113 +94,64 @@ export default function Search() {
                       </>
                     ) : (
                       <>
-                        <FaSearch className="me-1" /> Advanced Filters
+                        <FaSearch className="me-1" /> Advanced
                       </>
                     )}
                   </Button>
                 )}
-                <Button type="submit" variant="primary">
-                  <FaSearch className="me-1" />
-                  Search
+                <Button type="submit" variant="dark">
+                  <FaSearch className="me-1" /> Search
                 </Button>
               </Col>
             </Row>
 
             {showAdvanced && (
               <Row className="g-3 mt-3">
-                <Col md={4}>
-                  <Form.Group controlId="brand">
-                    <Form.Label>Brand</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="brand"
-                      value={filters.brand}
-                      onChange={handleChange}
-                      placeholder="e.g. Rolex"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                  <Form.Group controlId="condition">
-                    <Form.Label>Condition</Form.Label>
-                    <Form.Select
-                      name="condition"
-                      value={filters.condition}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select...</option>
-                      <option value="New">New</option>
-                      <option value="Used">Used</option>
-                      <option value="Like New">Like New</option>
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                  <Form.Group controlId="color">
-                    <Form.Label>Color</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="color"
-                      value={filters.color}
-                      onChange={handleChange}
-                      placeholder="e.g. Black"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                  <Form.Group controlId="material">
-                    <Form.Label>Material</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="material"
-                      value={filters.material}
-                      onChange={handleChange}
-                      placeholder="e.g. Steel"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                  <Form.Group controlId="year">
-                    <Form.Label>Year</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="year"
-                      value={filters.year}
-                      onChange={handleChange}
-                      placeholder="e.g. 2022"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={2}>
-                  <Form.Group controlId="priceMin">
-                    <Form.Label>Min Price</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="priceMin"
-                      value={filters.priceMin}
-                      onChange={handleChange}
-                      placeholder="5000"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={2}>
-                  <Form.Group controlId="priceMax">
-                    <Form.Label>Max Price</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="priceMax"
-                      value={filters.priceMax}
-                      onChange={handleChange}
-                      placeholder="25000"
-                    />
-                  </Form.Group>
-                </Col>
+                {[
+                  ["brand", "Brand", "e.g. Rolex"],
+                  [
+                    "condition",
+                    "Condition",
+                    "",
+                    ["", "New", "Used", "Like New"],
+                  ],
+                  ["color", "Color", "e.g. Black"],
+                  ["material", "Material", "e.g. Steel"],
+                  ["year", "Year", "e.g. 2022"],
+                  ["priceMin", "Min Price", "5000"],
+                  ["priceMax", "Max Price", "25000"],
+                ].map(([key, label, placeholder, options], i) => (
+                  <Col md={options ? 4 : key.includes("Price") ? 2 : 4} key={i}>
+                    <Form.Group controlId={key}>
+                      <Form.Label>{label}</Form.Label>
+                      {options ? (
+                        <Form.Select
+                          name={key}
+                          value={filters[key]}
+                          onChange={handleChange}
+                        >
+                          {options.map((opt, idx) => (
+                            <option value={opt} key={idx}>
+                              {opt || "Select..."}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      ) : (
+                        <Form.Control
+                          type={
+                            key === "year" || key.includes("Price")
+                              ? "number"
+                              : "text"
+                          }
+                          name={key}
+                          value={filters[key]}
+                          onChange={handleChange}
+                          placeholder={placeholder}
+                        />
+                      )}
+                    </Form.Group>
+                  </Col>
+                ))}
               </Row>
             )}
           </Card>
@@ -220,30 +165,30 @@ export default function Search() {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>🔎 Search Results</Modal.Title>
+          <Modal.Title>Search Results</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {results.length === 0 ? (
             <p className="text-center text-muted">No results found.</p>
           ) : (
             results.map((watch) => (
-              <Card className="mb-3 shadow-sm border-light" key={watch.id}>
+              <Card className="mb-3 shadow-sm" key={watch.id}>
                 <Card.Body>
-                  <Card.Title className="fw-bold fs-5">
+                  <Card.Title className="fs-5 fw-bold">
                     {watch.brand} – {watch.reference}
                   </Card.Title>
-                  <Card.Text className="text-muted small mb-2">
+                  <Card.Text className="text-muted small">
                     {watch.year} • {watch.condition} • {watch.color} •{" "}
                     {watch.material}
                   </Card.Text>
-                  <Card.Text>
-                    <strong>Estimated Price:</strong> {watch.price}
+                  <Card.Text className="fw-semibold">
+                    Estimated Price: {watch.price}
                   </Card.Text>
                   <div className="d-flex gap-2 mt-2">
                     <Button variant="success" size="sm">
-                      Request Purchase Info
+                      Request Info
                     </Button>
-                    <Button variant="outline-primary" size="sm">
+                    <Button variant="outline-dark" size="sm">
                       Contact Seller
                     </Button>
                   </div>
@@ -258,6 +203,6 @@ export default function Search() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </PageTransition>
   );
 }

@@ -60,7 +60,7 @@ export default function AppNavbar() {
                 <Nav.Link as={Link} to="/account">
                   My Account
                 </Nav.Link>
-                {user?.role !== "admin" && (
+                {user?.role === "admin" && (
                   <Nav.Link as={Link} to="/plans">
                     Plans
                   </Nav.Link>

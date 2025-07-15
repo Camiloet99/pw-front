@@ -30,9 +30,7 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+  } = useForm({ resolver: yupResolver(schema) });
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -51,12 +49,12 @@ export default function Login() {
 
   return (
     <PageTransition>
-      <Container className="mt-5">
-        <Row className="justify-content-center align-items-center">
+      <Container className="py-5">
+        <Row className="justify-content-center">
           <Col md={6} lg={5}>
-            <Card className="shadow-lg">
+            <Card className="shadow-sm border-0 p-4">
               <Card.Body>
-                <h3 className="text-center mb-4">Welcome back</h3>
+                <h2 className="text-center mb-4 fw-semibold">Welcome Back</h2>
 
                 <Form onSubmit={handleSubmit(onSubmit)} noValidate>
                   <Form.Group className="mb-3" controlId="email">
@@ -85,10 +83,11 @@ export default function Login() {
                     </Form.Control.Feedback>
                   </Form.Group>
 
-                  <div className="d-grid">
+                  <div className="d-grid mb-3">
                     <Button
                       type="submit"
                       variant="primary"
+                      size="lg"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -107,8 +106,8 @@ export default function Login() {
                   </div>
                 </Form>
 
-                <div className="text-center mt-3">
-                  <a href="/forgot-password" className="text-muted">
+                <div className="text-center mb-3">
+                  <a href="/forgot-password" className="text-muted small">
                     Forgot your password?
                   </a>
                 </div>
@@ -116,7 +115,7 @@ export default function Login() {
                 <hr className="my-4" />
 
                 <div className="d-grid">
-                  <Button variant="outline-dark" disabled>
+                  <Button variant="outline-dark" size="lg" disabled>
                     <FaGoogle className="me-2" />
                     Log in with Google
                   </Button>

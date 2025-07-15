@@ -10,40 +10,42 @@ export default function Plans() {
 
   const handleUpgrade = () => {
     upgradeToPremium();
-    toast.success("You have been upgraded to the Premium Plan! 🚀");
+    toast.success("You’ve been upgraded to Premium! 🚀");
     navigate("/search");
   };
 
   return (
     <PageTransition>
       <Helmet>
-        <title>Subscription Plans - Rollie</title>
+        <title>Plans & Pricing - Rollie</title>
       </Helmet>
 
-      <div className="container mt-5">
-        <h2 className="mb-4 text-center">Choose Your Plan</h2>
+      <div className="container mt-5 mb-5">
+        <h2 className="text-center fw-semibold mb-2">Choose Your Plan</h2>
+        <p className="text-center text-muted mb-4">
+          Find the right plan for your watch journey.
+        </p>
 
         <div className="row justify-content-center g-4">
           {/* Free Plan */}
           <div className="col-md-5">
-            <div className="card border-primary shadow-sm h-100">
+            <div className="card border-0 shadow-lg h-100">
               <div className="card-body text-center">
-                <h4 className="card-title">Free Plan</h4>
-                <p className="card-text mt-3">Great for occasional use.</p>
-                <ul className="list-group list-group-flush text-start mt-3 mb-4">
-                  <li className="list-group-item">
-                    ✔ Up to 2 searches per month
-                  </li>
-                  <li className="list-group-item">✔ Access to basic search</li>
-                  <li className="list-group-item text-muted">
-                    ✖ No advanced filters
-                  </li>
-                  <li className="list-group-item text-muted">
-                    ✖ No saved searches
-                  </li>
+                <h4 className="card-title fw-bold">Free Plan</h4>
+                <p className="text-muted mt-2">Great for occasional users.</p>
+
+                <ul className="list-unstyled text-start mt-4 mb-4 small">
+                  <li>✔ Up to 2 searches per month</li>
+                  <li>✔ Access to basic search features</li>
+                  <li className="text-muted">✖ Advanced filters</li>
+                  <li className="text-muted">✖ Saved searches</li>
                 </ul>
-                <button className="btn btn-outline-primary" disabled>
-                  Current Plan
+
+                <button
+                  className="btn btn-outline-dark w-100"
+                  disabled={user?.plan === "free"}
+                >
+                  {user?.plan === "free" ? "Current Plan" : "Free Plan"}
                 </button>
               </div>
             </div>
@@ -51,27 +53,32 @@ export default function Plans() {
 
           {/* Premium Plan */}
           <div className="col-md-5">
-            <div className="card border-success shadow-sm h-100">
+            <div className="card border-0 shadow-lg h-100 bg-light">
               <div className="card-body text-center">
-                <h4 className="card-title">Premium Plan</h4>
-                <p className="card-text mt-3">
-                  Best for frequent users and watch resellers.
+                <h4 className="card-title fw-bold">Premium Plan</h4>
+                <p className="text-muted mt-2">
+                  Ideal for professionals and resellers.
                 </p>
-                <ul className="list-group list-group-flush text-start mt-3 mb-4">
-                  <li className="list-group-item">✔ Unlimited searches</li>
-                  <li className="list-group-item">
-                    ✔ Access to advanced filters
-                  </li>
-                  <li className="list-group-item">
-                    ✔ Save and revisit searches
-                  </li>
-                  <li className="list-group-item">
-                    ✔ Early access to price trends
-                  </li>
+
+                <ul className="list-unstyled text-start mt-4 mb-4 small">
+                  <li>✔ Unlimited searches</li>
+                  <li>✔ Access to advanced filters</li>
+                  <li>✔ Save and revisit your searches</li>
+                  <li>✔ Early access to market insights</li>
                 </ul>
-                <button className="btn btn-success" onClick={handleUpgrade}>
-                  Upgrade Now
-                </button>
+
+                {user?.plan === "premium" || user?.role === "admin" ? (
+                  <button className="btn btn-outline-success w-100" disabled>
+                    Current Plan
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-dark w-100"
+                    onClick={handleUpgrade}
+                  >
+                    Upgrade to Premium
+                  </button>
+                )}
               </div>
             </div>
           </div>

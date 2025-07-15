@@ -13,7 +13,9 @@ import {
   Button,
   Form,
   Spinner,
+  Badge,
 } from "react-bootstrap";
+import PageTransition from "../components/PageTransition";
 
 const schema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
@@ -59,53 +61,66 @@ export default function MyAccount() {
       name: `${data.firstName} ${data.lastName}`,
     };
     login(updatedUser);
-    toast.success("Account updated successfully!");
+    toast.success("Your account was updated successfully.");
     setIsEditing(false);
   };
 
   return (
-    <>
+    <PageTransition>
       <Helmet>
-        <title>My Account - LuxWatch</title>
+        <title>My Account - Rollie</title>
       </Helmet>
 
       <Container className="mt-5">
-        <h2 className="mb-4">My Account</h2>
+        <h2 className="mb-4 fw-semibold">Account Settings</h2>
 
-        <Card className="shadow-sm">
-          <Card.Body>
+        <Card className="shadow-sm border-0">
+          <Card.Body className="p-4">
             {!isEditing ? (
               <>
-                <Row className="mb-3">
+                <Row className="mb-2">
                   <Col md={6}>
-                    <strong>First Name:</strong> {user.firstName}
+                    <p className="mb-2">
+                      <strong>First Name:</strong> {user.firstName}
+                    </p>
                   </Col>
                   <Col md={6}>
-                    <strong>Last Name:</strong> {user.lastName}
+                    <p className="mb-2">
+                      <strong>Last Name:</strong> {user.lastName}
+                    </p>
                   </Col>
-                  <Col md={6} className="mt-3">
-                    <strong>Email:</strong> {user.email}
+                  <Col md={6} className="mt-2">
+                    <p className="mb-2">
+                      <strong>Email:</strong> {user.email}
+                    </p>
                   </Col>
-                  <Col md={6} className="mt-3">
-                    <strong>Phone:</strong> {user.phone}
+                  <Col md={6} className="mt-2">
+                    <p className="mb-2">
+                      <strong>Phone:</strong> {user.phone}
+                    </p>
                   </Col>
-                  <Col md={6} className="mt-3">
-                    <strong>Plan:</strong>{" "}
-                    <span
-                      className={`badge rounded-pill ${
-                        user.plan === "premium" || "admin"
-                          ? "bg-success"
-                          : "bg-secondary"
-                      }`}
-                    >
-                      {user.plan}
-                    </span>
+                  <Col md={6} className="mt-2">
+                    <p className="mb-0">
+                      <strong>Plan:</strong>{" "}
+                      <Badge
+                        bg={
+                          user.plan === "premium"
+                            ? "success"
+                            : user.plan === "admin"
+                            ? "danger"
+                            : "secondary"
+                        }
+                        pill
+                      >
+                        {user.plan}
+                      </Badge>
+                    </p>
                   </Col>
                 </Row>
 
-                <div className="text-end">
+                <div className="text-end mt-3">
                   <Button
-                    variant="outline-primary"
+                    variant="outline-dark"
                     onClick={() => setIsEditing(true)}
                   >
                     Edit Information
@@ -117,7 +132,9 @@ export default function MyAccount() {
                 <Row className="g-3">
                   <Col md={6}>
                     <Form.Group controlId="firstName">
-                      <Form.Label>First Name</Form.Label>
+                      <Form.Label className="fw-semibold">
+                        First Name
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         {...register("firstName")}
@@ -131,7 +148,7 @@ export default function MyAccount() {
 
                   <Col md={6}>
                     <Form.Group controlId="lastName">
-                      <Form.Label>Last Name</Form.Label>
+                      <Form.Label className="fw-semibold">Last Name</Form.Label>
                       <Form.Control
                         type="text"
                         {...register("lastName")}
@@ -145,7 +162,7 @@ export default function MyAccount() {
 
                   <Col md={6}>
                     <Form.Group controlId="phone">
-                      <Form.Label>Phone</Form.Label>
+                      <Form.Label className="fw-semibold">Phone</Form.Label>
                       <Form.Control
                         type="tel"
                         {...register("phone")}
@@ -159,7 +176,7 @@ export default function MyAccount() {
 
                   <Col md={6}>
                     <Form.Group controlId="email">
-                      <Form.Label>Email (read-only)</Form.Label>
+                      <Form.Label className="fw-semibold">Email</Form.Label>
                       <Form.Control value={user.email} readOnly disabled />
                     </Form.Group>
                   </Col>
@@ -174,11 +191,7 @@ export default function MyAccount() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={isSubmitting}
-                  >
+                  <Button type="submit" variant="dark" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
                         <Spinner
@@ -198,6 +211,6 @@ export default function MyAccount() {
           </Card.Body>
         </Card>
       </Container>
-    </>
+    </PageTransition>
   );
 }

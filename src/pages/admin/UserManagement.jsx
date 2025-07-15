@@ -1,4 +1,3 @@
-// pages/admin/UserManagement.jsx
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -15,6 +14,7 @@ import {
   getAllUsersMock,
 } from "../../services/adminService";
 import { toast } from "react-toastify";
+import PageTransition from "../../components/PageTransition";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -73,79 +73,100 @@ export default function UserManagement() {
 
   return (
     <Container className="mt-4">
-      <h2 className="mb-4">User Management</h2>
+      <h2 className="mb-4 text-center fw-semibold">User Management</h2>
       {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" />
+        <div className="text-center my-5">
+          <Spinner animation="border" variant="dark" />
         </div>
       ) : (
-        <>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Plan</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u._id}>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <Badge
-                      bg={
-                        u.plan === "premium"
-                          ? "success"
-                          : u.plan === "admin"
-                          ? "danger"
-                          : "secondary"
-                      }
-                    >
-                      {u.plan}
-                    </Badge>
-                  </td>
-                  <td>{u.active ? "Active" : "Inactive"}</td>
-                  <td className="d-flex gap-2 flex-wrap">
-                    {u.active && (
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => handleDeactivate(u._id)}
-                      >
-                        Deactivate
-                      </Button>
-                    )}
-                    {u.plan !== "free" && (
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handlePlanChange(u._id, "free")}
-                      >
-                        Set to Free
-                      </Button>
-                    )}
-                    {u.plan !== "premium" && (
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handlePlanChange(u._id, "premium")}
-                      >
-                        Set to Premium
-                      </Button>
-                    )}
-                  </td>
+        <PageTransition>
+          <div className="table-responsive shadow-sm">
+            <Table
+              bordered
+              hover
+              responsive
+              striped
+              className="mb-0 text-center align-middle"
+            >
+              <thead className="table-light">
+                <tr className="text-center">
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Plan</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-          <div className="d-flex justify-content-center">
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u._id} className="text-center">
+                    <td>{u.name}</td>
+                    <td className="text-muted">{u.email}</td>
+                    <td>
+                      <Badge
+                        bg={
+                          u.plan === "premium"
+                            ? "success"
+                            : u.plan === "admin"
+                            ? "danger"
+                            : "secondary"
+                        }
+                        className="text-uppercase px-3 py-1"
+                      >
+                        {u.plan}
+                      </Badge>
+                    </td>
+                    <td>
+                      <span
+                        className={
+                          u.active
+                            ? "text-success fw-medium"
+                            : "text-danger fw-medium"
+                        }
+                      >
+                        {u.active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2 flex-wrap">
+                        {u.active && (
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            onClick={() => handleDeactivate(u._id)}
+                          >
+                            Deactivate
+                          </Button>
+                        )}
+                        {u.plan !== "free" && (
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            onClick={() => handlePlanChange(u._id, "free")}
+                          >
+                            Set Free
+                          </Button>
+                        )}
+                        {u.plan !== "premium" && (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handlePlanChange(u._id, "premium")}
+                          >
+                            Set Premium
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          <div className="d-flex justify-content-center mt-4 mb-4">
             {renderPagination()}
           </div>
-        </>
+        </PageTransition>
       )}
     </Container>
   );
