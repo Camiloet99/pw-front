@@ -28,9 +28,8 @@ export default function Home() {
             intelligence.
           </p>
           <p className="text-muted mx-auto" style={{ maxWidth: "720px" }}>
-            Our AI engine analyzes thousands of data points across the web to
-            help you estimate fair market prices for any luxury watch. Make
-            informed decisions, whether you're buying or selling.
+            Our AI engine analyzes thousands of data points to help you estimate
+            fair market prices for any luxury watch. Make informed decisions.
           </p>
           <div className="d-flex justify-content-center gap-3 mt-4 flex-wrap">
             <Link

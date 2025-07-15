@@ -12,6 +12,8 @@ import {
 } from "react-bootstrap";
 import { FaSearch, FaTimesCircle } from "react-icons/fa";
 import PageTransition from "../components/PageTransition";
+import { saveSearchToHistory } from "../utils/history";
+import SearchHistory from "../components/SearchHistory";
 
 export default function Search() {
   const [filters, setFilters] = useState({
@@ -30,6 +32,7 @@ export default function Search() {
   const [showModal, setShowModal] = useState(false);
   const { user } = useAuth();
   const isPremium = user?.plan === "premium" || user?.role === "admin";
+  const [historyRefreshToggle, setHistoryRefreshToggle] = useState(false);
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -37,6 +40,12 @@ export default function Search() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+
+    // No guarda búsquedas vacías
+    if (!Object.values(filters).some((val) => val)) return;
+
+    if (isPremium) saveSearchToHistory(filters);
+
     setResults([
       {
         id: 1,
@@ -50,6 +59,26 @@ export default function Search() {
       },
     ]);
     setShowModal(true);
+  };
+
+  const handleRepeatSearch = (prevFilters) => {
+    setFilters(prevFilters);
+    setTimeout(() => {
+      setShowAdvanced(true);
+      setShowModal(true);
+      setResults([
+        {
+          id: 1,
+          brand: prevFilters.brand || "Rolex",
+          reference: prevFilters.reference || "126610LN",
+          condition: prevFilters.condition || "Like New",
+          color: prevFilters.color || "Black",
+          material: prevFilters.material || "Steel",
+          year: prevFilters.year || "2022",
+          price: "$12,800",
+        },
+      ]);
+    }, 100);
   };
 
   return (
@@ -157,6 +186,14 @@ export default function Search() {
           </Card>
         </Form>
       </Container>
+
+      {isPremium && (
+        <SearchHistory
+          onSearchRepeat={handleRepeatSearch}
+          refreshToggle={historyRefreshToggle}
+          onClear={() => setHistoryRefreshToggle(!historyRefreshToggle)}
+        />
+      )}
 
       <Modal
         show={showModal}

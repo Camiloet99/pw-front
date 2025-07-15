@@ -9,7 +9,6 @@ export default function AppNavbar() {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem("lux_token");
     toast.success("You have successfully logged out.");
     navigate("/");
   };

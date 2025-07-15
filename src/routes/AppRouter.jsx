@@ -20,9 +20,18 @@ import { AnimatePresence } from "framer-motion";
 import Footer from "../components/footer/Footer";
 import UploadDocument from "../pages/admin/UploadDocument";
 import UserManagement from "../pages/admin/UserManagement";
+import { Spinner, Container } from "react-bootstrap";
 
 export default function AppRouter() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center min-vh-100">
+        <Spinner animation="border" variant="dark" />
+      </Container>
+    );
+  }
 
   return (
     <AnimatePresence mode="wait">
@@ -31,15 +40,39 @@ export default function AppRouter() {
           <Navbar />
           <div className="container flex-grow-1 mt-4">
             <Routes>
+              {/* Home: redirige si ya está autenticado */}
               <Route
                 path="/"
                 element={
                   isAuthenticated ? <Navigate to="/search" replace /> : <Home />
                 }
               />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+
+              {/* Evitar login y register si ya inició sesión */}
+              <Route
+                path="/login"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/search" replace />
+                  ) : (
+                    <Login />
+                  )
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/search" replace />
+                  ) : (
+                    <Register />
+                  )
+                }
+              />
+
               <Route path="/forgot-password" element={<ForgotPassword />} />
+
+              {/* Rutas protegidas */}
               <Route
                 path="/plans"
                 element={
@@ -64,11 +97,15 @@ export default function AppRouter() {
                   </PrivateRoute>
                 }
               />
+
+              {/* Admin-only routes */}
               <Route
                 path="/admin/upload"
                 element={
-                  isAuthenticated && user?.role === "admin" ? (
-                    <UploadDocument />
+                  user?.role === "admin" ? (
+                    <PrivateRoute>
+                      <UploadDocument />
+                    </PrivateRoute>
                   ) : (
                     <Navigate to="/" replace />
                   )
@@ -77,7 +114,7 @@ export default function AppRouter() {
               <Route
                 path="/admin/users"
                 element={
-                  isAuthenticated && user?.role === "admin" ? (
+                  user?.role === "admin" ? (
                     <PrivateRoute>
                       <UserManagement />
                     </PrivateRoute>
