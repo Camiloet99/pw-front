@@ -17,7 +17,7 @@ export default function Plans() {
   return (
     <PageTransition>
       <Helmet>
-        <title>Subscription Plans - LuxWatch</title>
+        <title>Subscription Plans - Rollie</title>
       </Helmet>
 
       <div className="container mt-5">

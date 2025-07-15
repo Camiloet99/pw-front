@@ -11,15 +11,15 @@ export const loginUser = async (credentials) => {
       token: 'mocked-jwt-token',
       user: {
         email: credentials.email,
-        name: 'John Doe',
-        role: 'user',
+        firstName: 'John',
+        lastName: "Doe",
+        phoneNumber: "+13203332432",
+        role: 'admin',
+        plan: "admin"
       },
     };
     return mockedResponse;
 
-    // Real call (to be used when backend is ready)
-    // const res = await api.post('/auth/login', credentials);
-    // return res.data;
   } catch (error) {
     throw error.response?.data?.message || 'Login failed';
   }

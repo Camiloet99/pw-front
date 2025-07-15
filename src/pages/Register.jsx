@@ -5,8 +5,18 @@ import { registerUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageTransition from "../components/PageTransition";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Card,
+  Spinner,
+} from "react-bootstrap";
+import { FaGoogle } from "react-icons/fa";
 
-const phoneRegExp = /^\+?[1-9]\d{1,14}$/; // E.164 format
+const phoneRegExp = /^\+?[1-9]\d{1,14}$/;
 
 const schema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
@@ -33,7 +43,7 @@ export default function Register() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -54,105 +64,131 @@ export default function Register() {
 
   return (
     <PageTransition>
-      <div className="row justify-content-center mt-5">
-        <div className="col-md-6">
-          <h2 className="mb-4 text-center">Sign Up</h2>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className="mb-3">
-              <label className="form-label">First Name</label>
-              <input
-                type="text"
-                className={`form-control ${
-                  errors.firstName ? "is-invalid" : ""
-                }`}
-                {...register("firstName")}
-              />
-              {errors.firstName && (
-                <div className="invalid-feedback">
-                  {errors.firstName.message}
+      <Container className="mt-5">
+        <Row className="justify-content-center">
+          <Col md={7} lg={6}>
+            <Card className="shadow-lg">
+              <Card.Body>
+                <h3 className="text-center mb-3">Create your free account</h3>
+                <p className="text-center text-muted mb-4">
+                  Join <strong>Rollie</strong> and discover the real value of
+                  your luxury watches powered by AI. It’s quick, easy, and free.
+                </p>
+
+                <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+                  <Form.Group className="mb-3" controlId="firstName">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="John"
+                      isInvalid={!!errors.firstName}
+                      {...register("firstName")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.firstName?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="lastName">
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Doe"
+                      isInvalid={!!errors.lastName}
+                      {...register("lastName")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.lastName?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="phone">
+                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      placeholder="+1xxxxxxxxxx"
+                      isInvalid={!!errors.phone}
+                      {...register("phone")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.phone?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="email">
+                    <Form.Label>Email Address</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="you@example.com"
+                      isInvalid={!!errors.email}
+                      {...register("email")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="••••••••"
+                      isInvalid={!!errors.password}
+                      {...register("password")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="confirmPassword">
+                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="••••••••"
+                      isInvalid={!!errors.confirmPassword}
+                      {...register("confirmPassword")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.confirmPassword?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <div className="d-grid">
+                    <Button
+                      type="submit"
+                      variant="success"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Spinner
+                            animation="border"
+                            size="sm"
+                            className="me-2"
+                          />
+                          Creating account...
+                        </>
+                      ) : (
+                        "Create Account"
+                      )}
+                    </Button>
+                  </div>
+                </Form>
+
+                <hr className="my-4" />
+
+                <div className="d-grid">
+                  <Button variant="outline-dark" disabled>
+                    <FaGoogle className="me-2" />
+                    Sign up with Google
+                  </Button>
                 </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Last Name</label>
-              <input
-                type="text"
-                className={`form-control ${
-                  errors.lastName ? "is-invalid" : ""
-                }`}
-                {...register("lastName")}
-              />
-              {errors.lastName && (
-                <div className="invalid-feedback">
-                  {errors.lastName.message}
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Phone Number</label>
-              <input
-                type="tel"
-                placeholder="+1xxxxxxxxxx"
-                className={`form-control ${errors.phone ? "is-invalid" : ""}`}
-                {...register("phone")}
-              />
-              {errors.phone && (
-                <div className="invalid-feedback">{errors.phone.message}</div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Email Address</label>
-              <input
-                type="email"
-                className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                {...register("email")}
-              />
-              {errors.email && (
-                <div className="invalid-feedback">{errors.email.message}</div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Password</label>
-              <input
-                type="password"
-                className={`form-control ${
-                  errors.password ? "is-invalid" : ""
-                }`}
-                {...register("password")}
-              />
-              {errors.password && (
-                <div className="invalid-feedback">
-                  {errors.password.message}
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Confirm Password</label>
-              <input
-                type="password"
-                className={`form-control ${
-                  errors.confirmPassword ? "is-invalid" : ""
-                }`}
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <div className="invalid-feedback">
-                  {errors.confirmPassword.message}
-                </div>
-              )}
-            </div>
-
-            <button type="submit" className="btn btn-success w-100">
-              Create Account
-            </button>
-          </form>
-        </div>
-      </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </PageTransition>
   );
 }

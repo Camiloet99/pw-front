@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <>
       <Helmet>
-        <title>Page Not Found - LuxWatch</title>
+        <title>Page Not Found - Rollie</title>
       </Helmet>
 
       <div className="container text-center mt-5">

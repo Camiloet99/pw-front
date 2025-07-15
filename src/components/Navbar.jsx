@@ -1,8 +1,9 @@
+import { Navbar, Nav, Container, Button, Badge } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 
-export default function Navbar() {
+export default function AppNavbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,78 +15,78 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <Link className="navbar-brand" to="/">
-          LuxWatch
-        </Link>
-
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
+    <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect sticky="top">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          Rollie
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="rollie-navbar" />
+        <Navbar.Collapse id="rollie-navbar">
+          <Nav className="ms-auto">
             {isAuthenticated ? (
               <>
-                <li className="nav-item">
-                  <span className="nav-link d-flex align-items-center gap-2">
-                    Welcome, <strong>{user.name}</strong>
-                    <span
-                      className={`badge rounded-pill ${
-                        user.plan === "premium" ? "bg-success" : "bg-secondary"
-                      }`}
-                    >
-                      {user.plan === "premium" ? "Premium" : "Free"}
-                    </span>
-                  </span>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/search">
-                    Search
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/account">
-                    My Account
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/plans">
-                    Plans
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <button
-                    className="btn btn-outline-light ms-2"
-                    onClick={handleLogout}
+                <Nav.Link disabled className="d-flex align-items-center gap-2">
+                  Welcome, <strong>{user?.firstName}</strong>
+                  <Badge
+                    bg={
+                      user.role === "admin"
+                        ? "danger"
+                        : user.plan === "premium"
+                        ? "success"
+                        : "secondary"
+                    }
+                    pill
                   >
-                    Log Out
-                  </button>
-                </li>
+                    {user.role === "admin"
+                      ? "Admin"
+                      : user.plan === "premium"
+                      ? "Premium"
+                      : "Free"}
+                  </Badge>
+                </Nav.Link>
+                {user?.role === "admin" && (
+                  <Nav.Link as={Link} to="/admin/upload">
+                    Upload Document
+                  </Nav.Link>
+                )}
+                {user?.role === "admin" && (
+                  <Nav.Link as={Link} to="/admin/users">
+                    Manage Users
+                  </Nav.Link>
+                )}
+                <Nav.Link as={Link} to="/search">
+                  Search
+                </Nav.Link>
+                <Nav.Link as={Link} to="/account">
+                  My Account
+                </Nav.Link>
+                {user?.role !== "admin" && (
+                  <Nav.Link as={Link} to="/plans">
+                    Plans
+                  </Nav.Link>
+                )}
+                <Button
+                  variant="outline-light"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="ms-2"
+                >
+                  Log Out
+                </Button>
               </>
             ) : (
               <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/login">
-                    Log In
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/register">
-                    Sign Up
-                  </Link>
-                </li>
+                <Nav.Link as={Link} to="/login">
+                  Log In
+                </Nav.Link>
+                <Nav.Link as={Link} to="/register">
+                  Sign Up
+                </Nav.Link>
               </>
             )}
-          </ul>
-        </div>
-      </div>
-    </nav>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }

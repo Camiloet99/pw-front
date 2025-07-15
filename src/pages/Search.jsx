@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  Button,
+  Form,
+  Modal,
+  Container,
+  Row,
+  Col,
+  Card,
+} from "react-bootstrap";
+import { FaSearch, FaTimesCircle } from "react-icons/fa";
 
 export default function Search() {
   const [filters, setFilters] = useState({
@@ -16,8 +26,10 @@ export default function Search() {
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
   const { user } = useAuth();
-  const isPremium = user?.plan === "premium";
+  const isPremium = user?.plan === "premium" || user?.role === "admin";
 
   const handleChange = (e) => {
     setFilters({
@@ -29,13 +41,12 @@ export default function Search() {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    // Simulate search results
     const mockResult = [
       {
         id: 1,
         brand: filters.brand || "Rolex",
-        reference: filters.reference || "12345",
-        condition: filters.condition || "Used",
+        reference: filters.reference || "126610LN",
+        condition: filters.condition || "Like New",
         color: filters.color || "Black",
         material: filters.material || "Steel",
         year: filters.year || "2022",
@@ -43,166 +54,210 @@ export default function Search() {
       },
     ];
     setResults(mockResult);
+    setShowModal(true);
   };
 
   return (
     <>
       <Helmet>
-        <title>Search Watches - LuxWatch</title>
+        <title>Search Watches - Rollie</title>
       </Helmet>
 
-      <div className="container mt-4">
-        <h2 className="mb-4">Search Luxury Watches</h2>
+      <Container className="mt-4">
+        <div className="text-center mb-4">
+          <h2>Search Luxury Watches</h2>
+          <p className="text-muted small">
+            Find the latest prices and details for high-end timepieces.
+          </p>
+        </div>
 
-        <form onSubmit={handleSearch} className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label">Reference</label>
-            <input
-              type="text"
-              name="reference"
-              className="form-control"
-              value={filters.reference}
-              onChange={handleChange}
-              placeholder="e.g. 126610LN"
-            />
-          </div>
+        <Form onSubmit={handleSearch}>
+          <Card className="p-4 shadow-sm mb-4">
+            <Row className="g-3 align-items-end">
+              <Col md={6}>
+                <Form.Group controlId="reference">
+                  <Form.Label>Reference</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="reference"
+                    value={filters.reference}
+                    onChange={handleChange}
+                    placeholder="e.g. 126610LN"
+                  />
+                </Form.Group>
+              </Col>
 
-          <div className="col-md-6 d-flex align-items-end justify-content-end">
-            {isPremium && (
-              <button
-                type="button"
-                className="btn btn-outline-secondary me-2"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-              >
-                {showAdvanced ? "Hide Advanced Search" : "Show Advanced Search"}
-              </button>
+              <Col md={6} className="d-flex justify-content-end">
+                {isPremium && (
+                  <Button
+                    variant="outline-dark"
+                    className="me-2"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                  >
+                    {showAdvanced ? (
+                      <>
+                        <FaTimesCircle className="me-1" /> Hide Filters
+                      </>
+                    ) : (
+                      <>
+                        <FaSearch className="me-1" /> Advanced Filters
+                      </>
+                    )}
+                  </Button>
+                )}
+                <Button type="submit" variant="primary">
+                  <FaSearch className="me-1" />
+                  Search
+                </Button>
+              </Col>
+            </Row>
+
+            {showAdvanced && (
+              <Row className="g-3 mt-3">
+                <Col md={4}>
+                  <Form.Group controlId="brand">
+                    <Form.Label>Brand</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="brand"
+                      value={filters.brand}
+                      onChange={handleChange}
+                      placeholder="e.g. Rolex"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="condition">
+                    <Form.Label>Condition</Form.Label>
+                    <Form.Select
+                      name="condition"
+                      value={filters.condition}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select...</option>
+                      <option value="New">New</option>
+                      <option value="Used">Used</option>
+                      <option value="Like New">Like New</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="color">
+                    <Form.Label>Color</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="color"
+                      value={filters.color}
+                      onChange={handleChange}
+                      placeholder="e.g. Black"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="material">
+                    <Form.Label>Material</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="material"
+                      value={filters.material}
+                      onChange={handleChange}
+                      placeholder="e.g. Steel"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="year">
+                    <Form.Label>Year</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="year"
+                      value={filters.year}
+                      onChange={handleChange}
+                      placeholder="e.g. 2022"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={2}>
+                  <Form.Group controlId="priceMin">
+                    <Form.Label>Min Price</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="priceMin"
+                      value={filters.priceMin}
+                      onChange={handleChange}
+                      placeholder="5000"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={2}>
+                  <Form.Group controlId="priceMax">
+                    <Form.Label>Max Price</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="priceMax"
+                      value={filters.priceMax}
+                      onChange={handleChange}
+                      placeholder="25000"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
             )}
-            <button type="submit" className="btn btn-primary">
-              Search
-            </button>
-          </div>
+          </Card>
+        </Form>
+      </Container>
 
-          {showAdvanced && (
-            <>
-              <div className="col-md-4">
-                <label className="form-label">Brand</label>
-                <input
-                  type="text"
-                  name="brand"
-                  className="form-control"
-                  value={filters.brand}
-                  onChange={handleChange}
-                  placeholder="e.g. Rolex"
-                />
-              </div>
-
-              <div className="col-md-4">
-                <label className="form-label">Condition</label>
-                <select
-                  name="condition"
-                  className="form-select"
-                  value={filters.condition}
-                  onChange={handleChange}
-                >
-                  <option value="">Select...</option>
-                  <option value="New">New</option>
-                  <option value="Used">Used</option>
-                  <option value="Like New">Like New</option>
-                </select>
-              </div>
-
-              <div className="col-md-4">
-                <label className="form-label">Color</label>
-                <input
-                  type="text"
-                  name="color"
-                  className="form-control"
-                  value={filters.color}
-                  onChange={handleChange}
-                  placeholder="e.g. Black"
-                />
-              </div>
-
-              <div className="col-md-4">
-                <label className="form-label">Material</label>
-                <input
-                  type="text"
-                  name="material"
-                  className="form-control"
-                  value={filters.material}
-                  onChange={handleChange}
-                  placeholder="e.g. Steel"
-                />
-              </div>
-
-              <div className="col-md-4">
-                <label className="form-label">Year</label>
-                <input
-                  type="number"
-                  name="year"
-                  className="form-control"
-                  value={filters.year}
-                  onChange={handleChange}
-                  placeholder="e.g. 2021"
-                />
-              </div>
-
-              <div className="col-md-2">
-                <label className="form-label">Min Price</label>
-                <input
-                  type="number"
-                  name="priceMin"
-                  className="form-control"
-                  value={filters.priceMin}
-                  onChange={handleChange}
-                  placeholder="e.g. 5000"
-                />
-              </div>
-
-              <div className="col-md-2">
-                <label className="form-label">Max Price</label>
-                <input
-                  type="number"
-                  name="priceMax"
-                  className="form-control"
-                  value={filters.priceMax}
-                  onChange={handleChange}
-                  placeholder="e.g. 25000"
-                />
-              </div>
-            </>
-          )}
-        </form>
-
-        <hr className="my-4" />
-
-        {results.length > 0 && (
-          <div className="row">
-            {results.map((watch) => (
-              <div className="col-md-4 mb-4" key={watch.id}>
-                <div className="card h-100 shadow-sm">
-                  <div className="card-body">
-                    <h5 className="card-title">{watch.brand}</h5>
-                    <p className="card-text">
-                      <strong>Reference:</strong> {watch.reference}
-                      <br />
-                      <strong>Condition:</strong> {watch.condition}
-                      <br />
-                      <strong>Color:</strong> {watch.color}
-                      <br />
-                      <strong>Material:</strong> {watch.material}
-                      <br />
-                      <strong>Year:</strong> {watch.year}
-                      <br />
-                      <strong>Estimated Price:</strong> {watch.price}
-                    </p>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>🔎 Search Results</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {results.length === 0 ? (
+            <p className="text-center text-muted">No results found.</p>
+          ) : (
+            results.map((watch) => (
+              <Card className="mb-3 shadow-sm border-light" key={watch.id}>
+                <Card.Body>
+                  <Card.Title className="fw-bold fs-5">
+                    {watch.brand} – {watch.reference}
+                  </Card.Title>
+                  <Card.Text className="text-muted small mb-2">
+                    {watch.year} • {watch.condition} • {watch.color} •{" "}
+                    {watch.material}
+                  </Card.Text>
+                  <Card.Text>
+                    <strong>Estimated Price:</strong> {watch.price}
+                  </Card.Text>
+                  <div className="d-flex gap-2 mt-2">
+                    <Button variant="success" size="sm">
+                      Request Purchase Info
+                    </Button>
+                    <Button variant="outline-primary" size="sm">
+                      Contact Seller
+                    </Button>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                </Card.Body>
+              </Card>
+            ))
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
