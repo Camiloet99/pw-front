@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/pw-front/static/css/main.c0566354.css",
-    "main.js": "/pw-front/static/js/main.3d1d6545.js",
-    "static/js/453.d4cf4faf.chunk.js": "/pw-front/static/js/453.d4cf4faf.chunk.js",
-    "index.html": "/pw-front/index.html",
-    "main.c0566354.css.map": "/pw-front/static/css/main.c0566354.css.map",
-    "main.3d1d6545.js.map": "/pw-front/static/js/main.3d1d6545.js.map",
-    "453.d4cf4faf.chunk.js.map": "/pw-front/static/js/453.d4cf4faf.chunk.js.map"
+    "main.css": "/pw-front/home/static/css/main.c0566354.css",
+    "main.js": "/pw-front/home/static/js/main.6c140bb8.js",
+    "static/js/453.d4cf4faf.chunk.js": "/pw-front/home/static/js/453.d4cf4faf.chunk.js",
+    "index.html": "/pw-front/home/index.html",
+    "main.c0566354.css.map": "/pw-front/home/static/css/main.c0566354.css.map",
+    "main.6c140bb8.js.map": "/pw-front/home/static/js/main.6c140bb8.js.map",
+    "453.d4cf4faf.chunk.js.map": "/pw-front/home/static/js/453.d4cf4faf.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c0566354.css",
-    "static/js/main.3d1d6545.js"
+    "static/js/main.6c140bb8.js"
   ]
 }
