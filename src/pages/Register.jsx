@@ -47,8 +47,10 @@ export default function Register() {
 
   const onSubmit = async (data) => {
     try {
-      const { user } = await registerUser(data);
-      toast.success(`Welcome ${user.name || "user"}! Your account is ready.`);
+      await registerUser(data);
+      toast.success(
+        `Welcome ${data?.firstName || "user"}! Your account is ready.`
+      );
       navigate("/login");
     } catch (err) {
       toast.error("Registration failed. Please try again.");

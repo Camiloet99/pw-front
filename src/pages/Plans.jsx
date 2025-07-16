@@ -43,9 +43,9 @@ export default function Plans() {
 
                 <button
                   className="btn btn-outline-dark w-100"
-                  disabled={user?.plan === "free"}
+                  disabled={user?.plan === "FREE"}
                 >
-                  {user?.plan === "free" ? "Current Plan" : "Free Plan"}
+                  {user?.plan === "FREE" ? "Current Plan" : "Free Plan"}
                 </button>
               </div>
             </div>

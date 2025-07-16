@@ -37,7 +37,9 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const { user, token } = await loginUser(data);
+      const response = await loginUser(data);
+      const user = response?.result?.user;
+      const token = response?.token;
       login(user);
       localStorage.setItem("lux_token", token);
       toast.success(`Welcome back, ${user.firstName || "user"}!`);
