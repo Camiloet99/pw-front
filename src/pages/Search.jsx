@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -30,9 +30,22 @@ export default function Search() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [results, setResults] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const { user } = useAuth();
-  const isPremium = user?.plan === "premium" || user?.role === "admin";
   const [historyRefreshToggle, setHistoryRefreshToggle] = useState(false);
+  const { user, tiers } = useAuth();
+
+  // Nuevo: estados derivados del tier del usuario
+  const [showAdvancedEnabled, setShowAdvancedEnabled] = useState(false);
+  const [searchHistoryLimit, setSearchHistoryLimit] = useState(0);
+
+  // Obtener tier actual del usuario
+  const userTier = tiers?.find((t) => t.id === user?.planId);
+
+  useEffect(() => {
+    if (userTier) {
+      setShowAdvancedEnabled(userTier.advancedSearch || false);
+      setSearchHistoryLimit(userTier.searchHistoryLimit || 0);
+    }
+  }, [userTier]);
 
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -40,11 +53,13 @@ export default function Search() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-
-    // No guarda búsquedas vacías
     if (!Object.values(filters).some((val) => val)) return;
 
-    if (isPremium) saveSearchToHistory(filters);
+    // Guarda solo si hay espacio en el historial
+    if (searchHistoryLimit > 0) {
+      saveSearchToHistory(filters, searchHistoryLimit);
+      setHistoryRefreshToggle((prev) => !prev); // fuerza re-render del historial
+    }
 
     setResults([
       {
@@ -111,7 +126,7 @@ export default function Search() {
                 </Form.Group>
               </Col>
               <Col md={6} className="d-flex justify-content-end">
-                {isPremium && (
+                {showAdvancedEnabled && (
                   <Button
                     variant="outline-secondary"
                     className="me-2"
@@ -187,7 +202,7 @@ export default function Search() {
         </Form>
       </Container>
 
-      {isPremium && (
+      {searchHistoryLimit > 0 && (
         <SearchHistory
           onSearchRepeat={handleRepeatSearch}
           refreshToggle={historyRefreshToggle}

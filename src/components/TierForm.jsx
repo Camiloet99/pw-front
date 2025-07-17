@@ -141,63 +141,61 @@ const TierForm = ({ initialData = null, onSubmit, onCancel }) => {
         </InputGroup>
       </Form.Group>
 
-      <Row className="mb-4">
-        <Col md={6}>
-          <Form.Check
-            type="switch"
-            label="Price Drop Notifications"
-            checked={properties.priceDropNotification}
-            onChange={(e) =>
-              setProperties({
-                ...properties,
-                priceDropNotification: e.target.checked,
-              })
-            }
-          />
-        </Col>
-        <Col md={6}>
-          <Form.Label>Search History Limit</Form.Label>
-          <Form.Control
-            type="number"
-            value={properties.searchHistoryLimit}
-            onChange={(e) =>
-              setProperties({
-                ...properties,
-                searchHistoryLimit: parseInt(e.target.value),
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Group className="mb-3">
+        <Form.Label>Search History Limit</Form.Label>
+        <Form.Control
+          type="number"
+          value={properties.searchHistoryLimit}
+          onChange={(e) =>
+            setProperties({
+              ...properties,
+              searchHistoryLimit: parseInt(e.target.value),
+            })
+          }
+        />
+      </Form.Group>
 
-      <Row className="mb-3">
-        <Col md={6}>
-          <Form.Check
-            type="switch"
-            label="Historical Price Graph"
-            checked={properties.priceHistoryGraph}
-            onChange={(e) =>
-              setProperties({
-                ...properties,
-                priceHistoryGraph: e.target.checked,
-              })
-            }
-          />
-        </Col>
-        <Col md={6}>
-          <Form.Check
-            type="switch"
-            label="Autocomplete by Reference"
-            checked={properties.autocompleteReference}
-            onChange={(e) =>
-              setProperties({
-                ...properties,
-                autocompleteReference: e.target.checked,
-              })
-            }
-          />
-        </Col>
-      </Row>
+      <Form.Group className="mb-3">
+        <Form.Check
+          type="switch"
+          label="Price Drop Notifications"
+          checked={properties.priceDropNotification}
+          onChange={(e) =>
+            setProperties({
+              ...properties,
+              priceDropNotification: e.target.checked,
+            })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Check
+          type="switch"
+          label="Historical Price Graph"
+          checked={properties.priceHistoryGraph}
+          onChange={(e) =>
+            setProperties({
+              ...properties,
+              priceHistoryGraph: e.target.checked,
+            })
+          }
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Check
+          type="switch"
+          label="Autocomplete by Reference"
+          checked={properties.autocompleteReference}
+          onChange={(e) =>
+            setProperties({
+              ...properties,
+              autocompleteReference: e.target.checked,
+            })
+          }
+        />
+      </Form.Group>
 
       <Form.Check
         type="switch"

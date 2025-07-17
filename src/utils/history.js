@@ -1,33 +1,30 @@
-const HISTORY_KEY = "searchHistory";
-
-export function saveSearchToHistory(queryObj) {
-  let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-
-  // Verificamos si ya existe una búsqueda igual
-  const existingIndex = history.findIndex(
-    (entry) =>
-      JSON.stringify({ ...entry, timestamp: undefined }) ===
-      JSON.stringify({ ...queryObj, timestamp: undefined })
-  );
-
-  if (existingIndex !== -1) {
-    // Si existe, actualizamos la hora y movemos al inicio
-    history.splice(existingIndex, 1);
-  }
-
-  const newEntry = {
-    ...queryObj,
-    timestamp: new Date().toISOString(),
-  };
-
-  const updatedHistory = [newEntry, ...history].slice(0, 10);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
-}
+const STORAGE_KEY = "search_history";
 
 export function getSearchHistory() {
-  return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : [];
 }
 
 export function clearSearchHistory() {
-  localStorage.removeItem(HISTORY_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+/**
+ * Guarda una búsqueda al historial limitado.
+ * @param {Object} filters - Filtros de búsqueda.
+ * @param {number} limit - Límite máximo de entradas en historial.
+ */
+export function saveSearchToHistory(filters, limit = 10) {
+  if (!filters) return;
+
+  const history = getSearchHistory();
+
+  const newEntry = {
+    ...filters,
+    timestamp: Date.now(),
+  };
+
+  const updatedHistory = [newEntry, ...history].slice(0, limit);
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
 }

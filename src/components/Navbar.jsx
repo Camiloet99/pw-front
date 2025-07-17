@@ -1,4 +1,11 @@
-import { Navbar, Nav, Container, Button, Badge } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Button,
+  Badge,
+  NavDropdown,
+} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
@@ -13,13 +20,12 @@ export default function AppNavbar() {
     navigate("/");
   };
 
-  // Encuentra el tier correspondiente al plan del usuario
   const currentTier = tiers?.find((t) => t.id === user?.planId);
 
   const getBadgeLabel = () => {
     if (user?.role === "ADMIN") return "Admin";
     if (currentTier?.name) return currentTier.name.toUpperCase();
-    return "Plan"; // Fallback
+    return "Plan";
   };
 
   const getBadgeColor = () => {
@@ -35,10 +41,13 @@ export default function AppNavbar() {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="rollie-navbar" />
         <Navbar.Collapse id="rollie-navbar">
-          <Nav className="ms-auto">
+          <Nav className="ms-auto align-items-center">
             {isAuthenticated ? (
               <>
-                <Nav.Link disabled className="d-flex align-items-center gap-2">
+                <Nav.Link
+                  disabled
+                  className="d-flex align-items-center gap-2 text-white"
+                >
                   Welcome, <strong>{user?.firstName}</strong>
                   <Badge bg={getBadgeColor()} pill>
                     {getBadgeLabel()}
@@ -46,17 +55,21 @@ export default function AppNavbar() {
                 </Nav.Link>
 
                 {user?.role === "ADMIN" && (
-                  <>
-                    <Nav.Link as={Link} to="/admin/upload">
+                  <NavDropdown
+                    title="Admin Panel"
+                    id="admin-dropdown"
+                    menuVariant="dark"
+                  >
+                    <NavDropdown.Item as={Link} to="/admin/upload">
                       Upload Document
-                    </Nav.Link>
-                    <Nav.Link as={Link} to="/admin/users">
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/users">
                       Manage Users
-                    </Nav.Link>
-                    <Nav.Link as={Link} to="/admin/tiers">
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/admin/tiers">
                       Manage Tiers
-                    </Nav.Link>
-                  </>
+                    </NavDropdown.Item>
+                  </NavDropdown>
                 )}
 
                 <Nav.Link as={Link} to="/search">
@@ -65,7 +78,6 @@ export default function AppNavbar() {
                 <Nav.Link as={Link} to="/account">
                   My Account
                 </Nav.Link>
-
                 {user?.role !== "ADMIN" && (
                   <Nav.Link as={Link} to="/plans">
                     Plans
@@ -76,7 +88,7 @@ export default function AppNavbar() {
                   variant="outline-light"
                   size="sm"
                   onClick={handleLogout}
-                  className="ms-2"
+                  className="ms-lg-2 mt-2 mt-lg-0"
                 >
                   Log Out
                 </Button>
