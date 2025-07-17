@@ -42,7 +42,7 @@ export default function UploadDocument() {
     }
   };
 
-  if (!user || user.role !== "admin") {
+  if (!user || user.role !== "ADMIN") {
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
         <Alert variant="danger" className="text-center w-100">

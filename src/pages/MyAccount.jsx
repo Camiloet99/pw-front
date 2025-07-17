@@ -45,11 +45,12 @@ export default function MyAccount() {
   });
 
   useEffect(() => {
+    console.log(user);
     if (user) {
       reset({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        phone: user.phone || "",
+        phone: user.phoneNumber || "",
       });
     }
   }, [user, reset]);
@@ -96,7 +97,7 @@ export default function MyAccount() {
                   </Col>
                   <Col md={6} className="mt-2">
                     <p className="mb-2">
-                      <strong>Phone:</strong> {user.phone}
+                      <strong>Phone:</strong> {user.phoneNumber}
                     </p>
                   </Col>
                   <Col md={6} className="mt-2">

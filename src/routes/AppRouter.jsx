@@ -21,6 +21,7 @@ import Footer from "../components/footer/Footer";
 import UploadDocument from "../pages/admin/UploadDocument";
 import UserManagement from "../pages/admin/UserManagement";
 import { Spinner, Container } from "react-bootstrap";
+import AdminTierManagement from "../pages/AdminTierManagement";
 
 export default function AppRouter() {
   const { isAuthenticated, user, loading } = useAuth();
@@ -102,7 +103,7 @@ export default function AppRouter() {
               <Route
                 path="/admin/upload"
                 element={
-                  user?.role === "admin" ? (
+                  user?.role === "ADMIN" ? (
                     <PrivateRoute>
                       <UploadDocument />
                     </PrivateRoute>
@@ -114,9 +115,21 @@ export default function AppRouter() {
               <Route
                 path="/admin/users"
                 element={
-                  user?.role === "admin" ? (
+                  user?.role === "ADMIN" ? (
                     <PrivateRoute>
                       <UserManagement />
+                    </PrivateRoute>
+                  ) : (
+                    <Navigate to="/" replace />
+                  )
+                }
+              />
+              <Route
+                path="/admin/tiers"
+                element={
+                  isAuthenticated && user?.role === "ADMIN" ? (
+                    <PrivateRoute>
+                      <AdminTierManagement />
                     </PrivateRoute>
                   ) : (
                     <Navigate to="/" replace />

@@ -5,7 +5,11 @@ export const loginUser = async (credentials) => {
     const res = await api.post('/auth/login', {
       email: credentials.email,
       password: credentials.password,
-    });    
+    });
+    const token = res.data?.result?.token;
+    if (token) {
+      localStorage.setItem('rollie_token', token);
+    }
     return res.data;
   } catch (error) {
     throw error.response?.data?.message || 'Login failed';

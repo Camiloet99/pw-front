@@ -39,9 +39,7 @@ export default function Login() {
     try {
       const response = await loginUser(data);
       const user = response?.result?.user;
-      const token = response?.token;
       login(user);
-      localStorage.setItem("lux_token", token);
       toast.success(`Welcome back, ${user.firstName || "user"}!`);
       navigate("/search");
     } catch (err) {
