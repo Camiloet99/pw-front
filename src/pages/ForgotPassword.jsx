@@ -12,26 +12,51 @@ import {
 } from "react-bootstrap";
 import PageTransition from "../components/PageTransition";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { verifyUserIdentity } from "../services/authService";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^[0-9]{7,15}$/, "Invalid phone number"),
 });
 
 export default function ForgotPassword() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const [submittedEmail, setSubmittedEmail] = useState("");
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    // Aquí iría la lógica real para enviar correo
-    console.log("Password reset request:", data);
-    setSubmittedEmail(data.email);
+  const onSubmit = async (data) => {
+    setFeedback({ type: "", message: "" });
+
+    try {
+      const userResponse = await verifyUserIdentity(
+        data.email,
+        data.phoneNumber
+      );
+      setFeedback({
+        type: "success",
+        message: "Identity verified. Redirecting...",
+      });
+      setTimeout(
+        () => navigate(`/reset-password/${userResponse?.userId}`),
+        2000
+      );
+    } catch (err) {
+      setFeedback({
+        type: "danger",
+        message: "User not found or phone number does not match.",
+      });
+    }
   };
 
   return (
@@ -43,8 +68,7 @@ export default function ForgotPassword() {
               <Card.Body>
                 <h3 className="text-center mb-3">Forgot your password?</h3>
                 <p className="text-muted text-center mb-4">
-                  No worries. Enter your email and we’ll send you a link to
-                  reset your password.
+                  Enter your email and phone number to reset your password.
                 </p>
 
                 <Form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -61,17 +85,29 @@ export default function ForgotPassword() {
                     </Form.Control.Feedback>
                   </Form.Group>
 
+                  <Form.Group className="mb-3" controlId="phoneNumber">
+                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="e.g. 3012345678"
+                      isInvalid={!!errors.phoneNumber}
+                      {...register("phoneNumber")}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.phoneNumber?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
                   <div className="d-grid">
                     <Button type="submit" variant="primary">
-                      Send Reset Link
+                      Verify Identity
                     </Button>
                   </div>
                 </Form>
 
-                {isSubmitSuccessful && (
-                  <Alert variant="success" className="mt-4 text-center">
-                    If <strong>{submittedEmail}</strong> is registered, a reset
-                    link has been sent.
+                {feedback.message && (
+                  <Alert variant={feedback.type} className="mt-4 text-center">
+                    {feedback.message}
                   </Alert>
                 )}
               </Card.Body>

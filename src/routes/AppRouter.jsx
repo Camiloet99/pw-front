@@ -22,6 +22,7 @@ import UploadDocument from "../pages/admin/UploadDocument";
 import UserManagement from "../pages/admin/UserManagement";
 import { Spinner, Container } from "react-bootstrap";
 import AdminTierManagement from "../pages/AdminTierManagement";
+import ResetPassword from "../pages/ResetPassword";
 
 export default function AppRouter() {
   const { isAuthenticated, user, loading } = useAuth();
@@ -72,7 +73,10 @@ export default function AppRouter() {
               />
 
               <Route path="/forgot-password" element={<ForgotPassword />} />
-
+              <Route
+                path="/reset-password/:userId"
+                element={<ResetPassword />}
+              />
               {/* Rutas protegidas */}
               <Route
                 path="/plans"

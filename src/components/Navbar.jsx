@@ -4,13 +4,27 @@ import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 
 export default function AppNavbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, tiers } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     toast.success("You have successfully logged out.");
     navigate("/");
+  };
+
+  // Encuentra el tier correspondiente al plan del usuario
+  const currentTier = tiers?.find((t) => t.id === user?.planId);
+
+  const getBadgeLabel = () => {
+    if (user?.role === "ADMIN") return "Admin";
+    if (currentTier?.name) return currentTier.name.toUpperCase();
+    return "Plan"; // Fallback
+  };
+
+  const getBadgeColor = () => {
+    if (user?.role === "ADMIN") return "danger";
+    return "secondary";
   };
 
   return (
@@ -26,44 +40,32 @@ export default function AppNavbar() {
               <>
                 <Nav.Link disabled className="d-flex align-items-center gap-2">
                   Welcome, <strong>{user?.firstName}</strong>
-                  <Badge
-                    bg={
-                      user.role === "ADMIN"
-                        ? "danger"
-                        : user.plan === "premium"
-                        ? "success"
-                        : "secondary"
-                    }
-                    pill
-                  >
-                    {user.role === "ADMIN"
-                      ? "Admin"
-                      : user.plan === "premium"
-                      ? "Premium"
-                      : "Free"}
+                  <Badge bg={getBadgeColor()} pill>
+                    {getBadgeLabel()}
                   </Badge>
                 </Nav.Link>
+
                 {user?.role === "ADMIN" && (
-                  <Nav.Link as={Link} to="/admin/upload">
-                    Upload Document
-                  </Nav.Link>
+                  <>
+                    <Nav.Link as={Link} to="/admin/upload">
+                      Upload Document
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/admin/users">
+                      Manage Users
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/admin/tiers">
+                      Manage Tiers
+                    </Nav.Link>
+                  </>
                 )}
-                {user?.role === "ADMIN" && (
-                  <Nav.Link as={Link} to="/admin/users">
-                    Manage Users
-                  </Nav.Link>
-                )}
-                {user?.role === "ADMIN" && (
-                  <Nav.Link as={Link} to="/admin/tiers">
-                    Manage Tiers
-                  </Nav.Link>
-                )}
+
                 <Nav.Link as={Link} to="/search">
                   Search
                 </Nav.Link>
                 <Nav.Link as={Link} to="/account">
                   My Account
                 </Nav.Link>
+
                 {user?.role !== "ADMIN" && (
                   <Nav.Link as={Link} to="/plans">
                     Plans

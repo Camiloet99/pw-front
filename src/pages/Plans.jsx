@@ -3,15 +3,44 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageTransition from "../components/PageTransition";
+import { Modal, Button, Spinner, Row, Col } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { getAllTiers } from "../services/tierService";
+import { upgradeUserPlan } from "../services/userService";
+import TierCardClient from "../components/TierCardClient";
 
 export default function Plans() {
-  const { user, upgradeToPremium } = useAuth();
+  const { user, login } = useAuth(); // usamos login para actualizar el user en el contexto
   const navigate = useNavigate();
+  const [tiers, setTiers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTier, setSelectedTier] = useState(null);
 
-  const handleUpgrade = () => {
-    upgradeToPremium();
-    toast.success("You’ve been upgraded to Premium! 🚀");
-    navigate("/search");
+  useEffect(() => {
+    const fetchTiers = async () => {
+      try {
+        const data = await getAllTiers();
+        setTiers(data.filter((t) => t.active));
+      } catch (e) {
+        toast.error("Failed to load plans");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTiers();
+  }, []);
+
+  const handlePayment = async () => {
+    try {
+      await upgradeUserPlan(selectedTier.id);
+      toast.success(`You've been upgraded to ${selectedTier.name}!`);
+      const updatedUser = { ...user, planId: selectedTier.id };
+      login(updatedUser); // actualiza el user con el nuevo planId
+      setSelectedTier(null);
+      navigate("/search");
+    } catch (err) {
+      toast.error("Plan upgrade failed.");
+    }
   };
 
   return (
@@ -26,63 +55,24 @@ export default function Plans() {
           Find the right plan for your watch journey.
         </p>
 
-        <div className="row justify-content-center g-4">
-          {/* Free Plan */}
-          <div className="col-md-5">
-            <div className="card border-0 shadow-lg h-100">
-              <div className="card-body text-center">
-                <h4 className="card-title fw-bold">Free Plan</h4>
-                <p className="text-muted mt-2">Great for occasional users.</p>
-
-                <ul className="list-unstyled text-start mt-4 mb-4 small">
-                  <li>✔ Up to 2 searches per month</li>
-                  <li>✔ Access to basic search features</li>
-                  <li className="text-muted">✖ Advanced filters</li>
-                  <li className="text-muted">✖ Saved searches</li>
-                </ul>
-
-                <button
-                  className="btn btn-outline-dark w-100"
-                  disabled={user?.plan === "FREE"}
-                >
-                  {user?.plan === "FREE" ? "Current Plan" : "Free Plan"}
-                </button>
-              </div>
-            </div>
+        {loading ? (
+          <div className="text-center mt-5">
+            <Spinner animation="border" variant="dark" />
           </div>
-
-          {/* Premium Plan */}
-          <div className="col-md-5">
-            <div className="card border-0 shadow-lg h-100 bg-light">
-              <div className="card-body text-center">
-                <h4 className="card-title fw-bold">Premium Plan</h4>
-                <p className="text-muted mt-2">
-                  Ideal for professionals and resellers.
-                </p>
-
-                <ul className="list-unstyled text-start mt-4 mb-4 small">
-                  <li>✔ Unlimited searches</li>
-                  <li>✔ Access to advanced filters</li>
-                  <li>✔ Save and revisit your searches</li>
-                  <li>✔ Early access to market insights</li>
-                </ul>
-
-                {user?.plan === "premium" || user?.role === "admin" ? (
-                  <button className="btn btn-outline-success w-100" disabled>
-                    Current Plan
-                  </button>
-                ) : (
-                  <button
-                    className="btn btn-dark w-100"
-                    onClick={handleUpgrade}
-                  >
-                    Upgrade to Premium
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        ) : (
+          <Row className="justify-content-center g-4">
+            {tiers.map((tier) => (
+              <Col key={tier.id} md={5}>
+                <TierCardClient
+                  tier={tier}
+                  currentPlan={user?.planId}
+                  isAdmin={user?.role === "admin"}
+                  onSelect={() => setSelectedTier(tier)}
+                />
+              </Col>
+            ))}
+          </Row>
+        )}
 
         <div className="text-center mt-4">
           <small className="text-muted">
@@ -90,6 +80,37 @@ export default function Plans() {
           </small>
         </div>
       </div>
+
+      {/* Modal de pago */}
+      <Modal
+        show={!!selectedTier}
+        onHide={() => setSelectedTier(null)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Plan Upgrade</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="mb-1">
+            You are about to upgrade to the{" "}
+            <strong>{selectedTier?.name}</strong> plan.
+          </p>
+          <h5 className="fw-bold mt-2">
+            ${selectedTier?.price?.toFixed(2)} USD
+          </h5>
+          <p className="text-muted small mt-2">
+            This is a simulated payment. No real charge will be made.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setSelectedTier(null)}>
+            Cancel
+          </Button>
+          <Button variant="dark" onClick={handlePayment}>
+            Pay Now
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </PageTransition>
   );
 }
