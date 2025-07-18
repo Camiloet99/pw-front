@@ -218,6 +218,10 @@ export default function MyAccount() {
             <Card className="shadow-sm border-0 h-100">
               <Card.Body className="p-4">
                 <h5 className="fw-semibold mb-3">My Favorites</h5>
+                <p className="text-muted small mb-4">
+                  Only the reference number is stored. Price, condition, and
+                  other details may vary based on daily market updates.
+                </p>
                 <FavoriteWatches />
               </Card.Body>
             </Card>

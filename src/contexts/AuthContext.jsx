@@ -77,6 +77,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("lux_user");
     setUser(null);
     setTiers([]);
+    setFavorites([]);
   };
 
   const isAuthenticated = !!user;

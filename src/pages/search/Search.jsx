@@ -33,6 +33,7 @@ export default function Search() {
   // Nuevo: estados derivados del tier del usuario
   const [showAdvancedEnabled, setShowAdvancedEnabled] = useState(false);
   const [searchHistoryLimit, setSearchHistoryLimit] = useState(0);
+  const [autocompleteEnabled, setAutocompleteEnabled] = useState(false);
 
   // Obtener tier actual del usuario
   const userTier = tiers?.find((t) => t.id === user?.planId);
@@ -41,6 +42,7 @@ export default function Search() {
     if (userTier) {
       setShowAdvancedEnabled(userTier.advancedSearch || false);
       setSearchHistoryLimit(userTier.searchHistoryLimit || 0);
+      setAutocompleteEnabled(userTier.autocompleteReference || false);
     }
   }, [userTier]);
 
@@ -50,7 +52,8 @@ export default function Search() {
 
     if (name === "reference") {
       setIsTyping(true);
-      if (value.length >= 3) {
+      if (autocompleteEnabled && value.length >= 3) {
+        // ✅ solo si está permitido
         try {
           const suggestions = await autocompleteReference(value);
           setReferenceSuggestions(suggestions);
@@ -90,8 +93,12 @@ export default function Search() {
 
   const handleRepeatSearch = (prevFilters) => {
     setFilters(prevFilters);
-    setTimeout(() => {
+    if (showAdvancedEnabled) {
       setShowAdvanced(true);
+    } else {
+      setShowAdvanced(false);
+    }
+    setTimeout(() => {
       setShowModal(true);
       setResults([
         {
@@ -137,30 +144,32 @@ export default function Search() {
                       placeholder="e.g. 126610LN"
                       autoComplete="off"
                     />
-                    {isTyping && referenceSuggestions.length > 0 && (
-                      <div
-                        className="position-absolute bg-white border rounded shadow-sm mt-1 w-100 z-3"
-                        style={{ maxHeight: "200px", overflowY: "auto" }}
-                      >
-                        {referenceSuggestions.map((suggestion, idx) => (
-                          <div
-                            key={idx}
-                            className="px-3 py-2 hover-bg-light text-muted"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => {
-                              setFilters((prev) => ({
-                                ...prev,
-                                reference: suggestion,
-                              }));
-                              setReferenceSuggestions([]);
-                              setIsTyping(false);
-                            }}
-                          >
-                            {suggestion}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {autocompleteEnabled &&
+                      isTyping &&
+                      referenceSuggestions.length > 0 && (
+                        <div
+                          className="position-absolute bg-white border rounded shadow-sm mt-1 w-100 z-3"
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          {referenceSuggestions.map((suggestion, idx) => (
+                            <div
+                              key={idx}
+                              className="px-3 py-2 hover-bg-light text-muted"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                setFilters((prev) => ({
+                                  ...prev,
+                                  reference: suggestion,
+                                }));
+                                setReferenceSuggestions([]);
+                                setIsTyping(false);
+                              }}
+                            >
+                              {suggestion}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 </Form.Group>
               </Col>
