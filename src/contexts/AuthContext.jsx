@@ -1,4 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import {
+  getUserFavorites,
+  removeFavoriteCall,
+} from "../services/favoriteService";
 import { getAllTiers } from "../services/tierService";
 
 const AuthContext = createContext();
@@ -6,16 +10,17 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tiers, setTiers] = useState([]); // fallback por si no usas el TierContext
+  const [tiers, setTiers] = useState([]);
+  const [favorites, setFavorites] = useState([]);
 
-  // Leer usuario de localStorage al montar el componente
   useEffect(() => {
     const storedUser = localStorage.getItem("lux_user");
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        fetchTiers(); // también carga tiers al inicializar
+        fetchTiers();
+        fetchFavorites(parsedUser.userId);
       } catch (error) {
         console.error("Error parsing stored user:", error);
         localStorage.removeItem("lux_user");
@@ -23,6 +28,27 @@ export function AuthProvider({ children }) {
     }
     setLoading(false);
   }, []);
+
+  const removeFavorite = async (reference) => {
+    if (!user) return;
+    try {
+      await removeFavoriteCall(user.userId, reference);
+      setFavorites((prev) =>
+        prev.filter((fav) => fav.referenceCode !== reference)
+      );
+    } catch (err) {
+      console.error("Failed to remove favorite:", err);
+    }
+  };
+
+  const fetchFavorites = async (userId) => {
+    try {
+      const favs = await getUserFavorites(userId);
+      setFavorites(favs || []);
+    } catch (err) {
+      console.error("Failed to fetch favorites:", err);
+    }
+  };
 
   const fetchTiers = async () => {
     try {
@@ -64,8 +90,11 @@ export function AuthProvider({ children }) {
         upgradeToPremium,
         isAuthenticated,
         loading,
-        tiers, // Opcional: expón los tiers desde aquí también
-        setTiers, // Opcional si necesitas modificarlos desde otros lugares
+        tiers,
+        setTiers,
+        favorites,
+        setFavorites,
+        removeFavorite,
       }}
     >
       {children}

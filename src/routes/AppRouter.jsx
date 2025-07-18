@@ -12,7 +12,7 @@ import Navbar from "../components/Navbar";
 import ForgotPassword from "../pages/ForgotPassword";
 import PrivateRoute from "./PrivateRoute";
 import MyAccount from "../pages/MyAccount";
-import Search from "../pages/Search";
+import Search from "../pages/search/Search";
 import { useAuth } from "../contexts/AuthContext";
 import Plans from "../pages/Plans";
 import NotFound from "../pages/NotFound";

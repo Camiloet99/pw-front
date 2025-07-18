@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { useAuth } from "../contexts/AuthContext";
-import {
-  Button,
-  Form,
-  Modal,
-  Container,
-  Row,
-  Col,
-  Card,
-} from "react-bootstrap";
+import { useAuth } from "../../contexts/AuthContext";
+import { Button, Form, Container, Row, Col, Card } from "react-bootstrap";
 import { FaSearch, FaTimesCircle } from "react-icons/fa";
-import PageTransition from "../components/PageTransition";
-import { saveSearchToHistory } from "../utils/history";
-import SearchHistory from "../components/SearchHistory";
+import PageTransition from "../../components/PageTransition";
+import { saveSearchToHistory } from "../../utils/history";
+import SearchHistory from "../../components/SearchHistory";
+import { autocompleteReference } from "../../services/watchService";
+import SearchResultsModal from "../../components/SearchResultsModal";
+import "./Search.css"; // Import your custom styles
 
 export default function Search() {
   const [filters, setFilters] = useState({
@@ -32,6 +27,8 @@ export default function Search() {
   const [showModal, setShowModal] = useState(false);
   const [historyRefreshToggle, setHistoryRefreshToggle] = useState(false);
   const { user, tiers } = useAuth();
+  const [referenceSuggestions, setReferenceSuggestions] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   // Nuevo: estados derivados del tier del usuario
   const [showAdvancedEnabled, setShowAdvancedEnabled] = useState(false);
@@ -47,8 +44,23 @@ export default function Search() {
     }
   }, [userTier]);
 
-  const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
+
+    if (name === "reference") {
+      setIsTyping(true);
+      if (value.length >= 3) {
+        try {
+          const suggestions = await autocompleteReference(value);
+          setReferenceSuggestions(suggestions);
+        } catch (err) {
+          setReferenceSuggestions([]);
+        }
+      } else {
+        setReferenceSuggestions([]);
+      }
+    }
   };
 
   const handleSearch = (e) => {
@@ -116,13 +128,40 @@ export default function Search() {
               <Col md={6}>
                 <Form.Group controlId="reference">
                   <Form.Label>Reference Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="reference"
-                    value={filters.reference}
-                    onChange={handleChange}
-                    placeholder="e.g. 126610LN"
-                  />
+                  <div className="position-relative">
+                    <Form.Control
+                      type="text"
+                      name="reference"
+                      value={filters.reference}
+                      onChange={handleChange}
+                      placeholder="e.g. 126610LN"
+                      autoComplete="off"
+                    />
+                    {isTyping && referenceSuggestions.length > 0 && (
+                      <div
+                        className="position-absolute bg-white border rounded shadow-sm mt-1 w-100 z-3"
+                        style={{ maxHeight: "200px", overflowY: "auto" }}
+                      >
+                        {referenceSuggestions.map((suggestion, idx) => (
+                          <div
+                            key={idx}
+                            className="px-3 py-2 hover-bg-light text-muted"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => {
+                              setFilters((prev) => ({
+                                ...prev,
+                                reference: suggestion,
+                              }));
+                              setReferenceSuggestions([]);
+                              setIsTyping(false);
+                            }}
+                          >
+                            {suggestion}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </Form.Group>
               </Col>
               <Col md={6} className="d-flex justify-content-end">
@@ -210,51 +249,11 @@ export default function Search() {
         />
       )}
 
-      <Modal
+      <SearchResultsModal
         show={showModal}
         onHide={() => setShowModal(false)}
-        size="lg"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Search Results</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {results.length === 0 ? (
-            <p className="text-center text-muted">No results found.</p>
-          ) : (
-            results.map((watch) => (
-              <Card className="mb-3 shadow-sm" key={watch.id}>
-                <Card.Body>
-                  <Card.Title className="fs-5 fw-bold">
-                    {watch.brand} – {watch.reference}
-                  </Card.Title>
-                  <Card.Text className="text-muted small">
-                    {watch.year} • {watch.condition} • {watch.color} •{" "}
-                    {watch.material}
-                  </Card.Text>
-                  <Card.Text className="fw-semibold">
-                    Estimated Price: {watch.price}
-                  </Card.Text>
-                  <div className="d-flex gap-2 mt-2">
-                    <Button variant="success" size="sm">
-                      Request Info
-                    </Button>
-                    <Button variant="outline-dark" size="sm">
-                      Contact Seller
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            ))
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        results={results}
+      />
     </PageTransition>
   );
 }

@@ -36,7 +36,6 @@ export async function verifyUserIdentity(email, phoneNumber) {
     email,
     phoneNumber,
   });
-  console.log(response);
   return response.data.result; // retorna el userId si es válido
 }
 
