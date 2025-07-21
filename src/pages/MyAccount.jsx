@@ -66,7 +66,7 @@ export default function MyAccount() {
         lastName: data.lastName,
         phoneNumber: data.phone,
       };
-      const result = await updateUserProfile(user.userId, payload);
+      await updateUserProfile(user.userId, payload);
       const updatedUser = {
         ...user,
         ...payload,

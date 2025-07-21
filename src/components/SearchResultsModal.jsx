@@ -3,6 +3,7 @@ import { Modal, Card, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { addFavorite, removeFavoriteCall } from "../services/favoriteService";
 import { useState } from "react";
+import moment from "moment";
 
 export default function SearchResultsModal({ show, onHide, results = [] }) {
   const { user, favorites, setFavorites } = useAuth();
@@ -15,14 +16,18 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
     setLoadingReference(reference);
     let updatedFavorites = [];
 
-    if (isFavorite(reference)) {
-      updatedFavorites = await removeFavoriteCall(user.userId, reference);
-    } else {
-      updatedFavorites = await addFavorite(user.userId, reference);
+    try {
+      if (isFavorite(reference)) {
+        updatedFavorites = await removeFavoriteCall(user.userId, reference);
+      } else {
+        updatedFavorites = await addFavorite(user.userId, reference);
+      }
+      setFavorites(updatedFavorites);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    } finally {
+      setLoadingReference(null);
     }
-
-    setFavorites(updatedFavorites);
-    setLoadingReference(null);
   };
 
   return (
@@ -41,15 +46,19 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
               className="mb-3 shadow-sm border-0 rounded-3"
               style={{ background: "#f9f9f9" }}
             >
+              {console.log(watch)}
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-start">
                   <div>
                     <Card.Title className="fs-5 fw-bold mb-1">
-                      {watch.brand} — {watch.reference}
+                      {watch.referenceCode}
                     </Card.Title>
                     <Card.Text className="text-muted small mb-2">
-                      {watch.year} • {watch.condition} • {watch.color} •{" "}
-                      {watch.material}
+                      {watch.year && `${watch.year} • `}
+                      {watch.condition} • {watch.colorDial}
+                    </Card.Text>
+                    <Card.Text className="text-muted small">
+                      Listed: {moment(watch.createdAt).format("MMM D, YYYY")}
                     </Card.Text>
                   </div>
 
@@ -57,7 +66,7 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
                     placement="top"
                     overlay={
                       <Tooltip>
-                        {isFavorite(watch.reference)
+                        {isFavorite(watch.referenceCode)
                           ? "Remove from favorites"
                           : "Add to favorites"}
                       </Tooltip>
@@ -67,10 +76,10 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
                       variant="link"
                       className="text-danger p-0 ms-2"
                       style={{ fontSize: "1.5rem" }}
-                      onClick={() => toggleFavorite(watch.reference)}
-                      disabled={loadingReference === watch.reference}
+                      onClick={() => toggleFavorite(watch.referenceCode)}
+                      disabled={loadingReference === watch.referenceCode}
                     >
-                      {isFavorite(watch.reference) ? (
+                      {isFavorite(watch.referenceCode) ? (
                         <AiFillHeart />
                       ) : (
                         <AiOutlineHeart />
@@ -80,7 +89,7 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
                 </div>
 
                 <Card.Text className="fw-semibold fs-6 mt-1">
-                  Estimated Price: ${Number(watch.price).toLocaleString()}
+                  Estimated Price: ${watch.cost?.toLocaleString()}
                 </Card.Text>
 
                 <div className="d-flex gap-2 mt-3">

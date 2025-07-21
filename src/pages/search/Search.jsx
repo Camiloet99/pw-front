@@ -6,7 +6,11 @@ import { FaSearch, FaTimesCircle } from "react-icons/fa";
 import PageTransition from "../../components/PageTransition";
 import { saveSearchToHistory } from "../../utils/history";
 import SearchHistory from "../../components/SearchHistory";
-import { autocompleteReference } from "../../services/watchService";
+import {
+  autocompleteReference,
+  searchWatches,
+  getWatchByReference,
+} from "../../services/watchService";
 import SearchResultsModal from "../../components/SearchResultsModal";
 import "./Search.css"; // Import your custom styles
 
@@ -66,53 +70,83 @@ export default function Search() {
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (!Object.values(filters).some((val) => val)) return;
 
-    // Guarda solo si hay espacio en el historial
-    if (searchHistoryLimit > 0) {
-      saveSearchToHistory(filters, searchHistoryLimit);
-      setHistoryRefreshToggle((prev) => !prev); // fuerza re-render del historial
-    }
+    try {
+      let fetchedResults = [];
 
-    setResults([
-      {
-        id: 1,
-        brand: filters.brand || "Rolex",
-        reference: filters.reference || "126610LN",
-        condition: filters.condition || "Like New",
-        color: filters.color || "Black",
-        material: filters.material || "Steel",
-        year: filters.year || "2022",
-        price: "$12,800",
-      },
-    ]);
-    setShowModal(true);
+      if (showAdvancedEnabled && showAdvanced) {
+        // Avanzado: usamos filtros completos
+        const payload = {
+          referenceCode: filters.reference,
+          colorDial: filters.color,
+          year: filters.year ? parseInt(filters.year) : null,
+          condition: filters.condition,
+          minPrice: filters.priceMin ? parseFloat(filters.priceMin) : null,
+          maxPrice: filters.priceMax ? parseFloat(filters.priceMax) : null,
+        };
+        fetchedResults = await searchWatches(payload);
+      } else {
+        // Básico: solo referencia
+        if (!filters.reference) return;
+        fetchedResults = await getWatchByReference(filters.reference);
+      }
+
+      // Guardar en historial si aplica
+      if (searchHistoryLimit > 0) {
+        saveSearchToHistory(filters, searchHistoryLimit);
+        setHistoryRefreshToggle((prev) => !prev);
+      }
+
+      setResults(fetchedResults);
+      setShowModal(true);
+    } catch (err) {
+      console.error("Search error:", err);
+      setResults([]);
+      setShowModal(true);
+    }
   };
 
-  const handleRepeatSearch = (prevFilters) => {
+  const handleRepeatSearch = async (prevFilters) => {
     setFilters(prevFilters);
-    if (showAdvancedEnabled) {
-      setShowAdvanced(true);
-    } else {
-      setShowAdvanced(false);
-    }
-    setTimeout(() => {
+    let fetchedResults = [];
+    try {
+      if (
+        showAdvancedEnabled &&
+        (filters.color.length ||
+          filters.year.length ||
+          filters.condition.length ||
+          filters.priceMin.length ||
+          filters.priceMax.length ||
+          filters.reference.length)
+      ) {
+        setShowAdvanced(true);
+        const payload = {
+          referenceCode: filters.reference,
+          colorDial: filters.color,
+          year: filters.year ? parseInt(filters.year) : null,
+          condition: filters.condition,
+          minPrice: filters.priceMin ? parseFloat(filters.priceMin) : null,
+          maxPrice: filters.priceMax ? parseFloat(filters.priceMax) : null,
+        };
+        fetchedResults = await searchWatches(payload);
+      } else {
+        setShowAdvanced(false);
+        if (!filters.reference) return;
+        fetchedResults = await getWatchByReference(filters.reference);
+      }
+      setTimeout(() => {
+        console.log("Holas");
+        setShowModal(true);
+        setResults(fetchedResults);
+      }, 100);
+    } catch (err) {
+      console.error("Search error:", err);
+      setResults([]);
       setShowModal(true);
-      setResults([
-        {
-          id: 1,
-          brand: prevFilters.brand || "Rolex",
-          reference: prevFilters.reference || "126610LN",
-          condition: prevFilters.condition || "Like New",
-          color: prevFilters.color || "Black",
-          material: prevFilters.material || "Steel",
-          year: prevFilters.year || "2022",
-          price: "$12,800",
-        },
-      ]);
-    }, 100);
+    }
   };
 
   return (

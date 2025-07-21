@@ -1,5 +1,5 @@
 import api from "./api";
-import { getWatchByReference, getWatchesByReferences } from "./watchService";
+import { getWatchesByReferences } from "./watchService";
 
 // === GET: Get favorite references and map to full data if needed ===
 export const getUserFavorites = async (userId) => {
