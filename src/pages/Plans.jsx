@@ -7,7 +7,7 @@ import { Modal, Button, Spinner, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { getAllTiers } from "../services/tierService";
 import { upgradeUserPlan } from "../services/userService";
-import TierCardClient from "../components/TierCardClient";
+import TierCardClient from "../components/tierCardClient/TierCardClient";
 
 export default function Plans() {
   const { user, login } = useAuth(); // usamos login para actualizar el user en el contexto
@@ -62,7 +62,7 @@ export default function Plans() {
         ) : (
           <Row className="justify-content-center g-4">
             {tiers.map((tier) => (
-              <Col key={tier.id} md={5}>
+              <Col key={tier.id} xs={12} sm={10} md={6} lg={5} xl={4}>
                 <TierCardClient
                   tier={tier}
                   currentPlan={user?.planId}

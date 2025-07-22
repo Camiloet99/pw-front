@@ -46,25 +46,29 @@ export default function TierCardClient({
   const isCurrent = currentPlan ? currentPlan === tier.id : false;
 
   return (
-    <Card className="h-100 shadow-lg border-0 bg-light">
-      <Card.Body className="text-center d-flex flex-column">
-        <h4 className="fw-bold text-dark">{tier.name}</h4>
-        <p className="text-muted small">{tier.description}</p>
-        <h5 className="fw-semibold my-3">${tier.price?.toFixed(2)}</h5>
+    <Card className="h-100 shadow-sm border-0 bg-white rounded-4 p-3">
+      <Card.Body className="d-flex flex-column">
+        <h4 className="fw-bold text-center text-dark mb-1">{tier.name}</h4>
+        <p className="text-center text-muted small mb-3">{tier.description}</p>
 
-        <ul className="list-unstyled text-start mt-3 mb-4 small">
+        <h5 className="fw-semibold text-center text-success mb-4">
+          ${tier.price?.toFixed(2)}{" "}
+          <span className="text-muted fs-6">/month</span>
+        </h5>
+
+        <ul className="list-unstyled small mb-4">
           {included.map((feat, idx) => (
-            <li key={idx} className="text-success">
+            <li key={idx} className="text-success mb-1">
               {feat.render || "✔ " + feat.label}
             </li>
           ))}
           {tier.extraProperties?.map((prop, idx) => (
-            <li key={`extra-${idx}`} className="text-muted fst-italic">
+            <li key={`extra-${idx}`} className="text-muted fst-italic mb-1">
               ✔ {prop}
             </li>
           ))}
           {excluded.map((feat, idx) => (
-            <li key={idx} className="text-muted">
+            <li key={idx} className="text-muted mb-1">
               ✖ {feat.label}
             </li>
           ))}
