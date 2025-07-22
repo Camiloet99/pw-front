@@ -1,5 +1,5 @@
 import api from "./api";
-import { getWatchesByReferences } from "./watchService";
+import { getWatchSummaryByReference } from "./watchService";
 
 // === GET: Get favorite references and map to full data if needed ===
 export const getUserFavorites = async (userId) => {
@@ -10,8 +10,14 @@ export const getUserFavorites = async (userId) => {
     if (!references || references.length === 0) {
       return [];
     }
-    const fullWatches = await getWatchesByReferences(references);
-    return fullWatches;
+
+    // Obtener resumen para cada referencia de forma paralela
+    const summaries = await Promise.all(
+      references.map((ref) => getWatchSummaryByReference(ref))
+    );
+
+    // Filtramos posibles nulls si alguna falla
+    return summaries.filter((summary) => summary != null);
   } catch (err) {
     console.error("Error fetching favorites:", err);
     return [];

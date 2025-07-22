@@ -60,17 +60,39 @@ export default function FavoriteWatches() {
               </OverlayTrigger>
               <Card.Body>
                 <Card.Title className="fs-5 fw-semibold text-dark">
-                  {watch.referenceCode}{" "}
-                  <Badge bg="light" text="dark" className="ms-2">
-                    {watch.condition}
-                  </Badge>
+                  {watch.referenceCode}
                 </Card.Title>
-                <Card.Text className="text-muted small mb-1">
-                  {watch.year} • {watch.colorDial}
+
+                <Card.Text className="fw-bold text-success fs-6 mb-2">
+                  ${watch.minPrice?.toLocaleString()} – $
+                  {watch.maxPrice?.toLocaleString()}
                 </Card.Text>
-                <Card.Text className="fw-bold text-success fs-6 mb-0">
-                  ${watch.cost?.toLocaleString()}
-                </Card.Text>
+
+                <div className="mb-2">
+                  {watch.conditions?.map((cond, i) => (
+                    <Badge key={i} bg="secondary" className="me-1">
+                      {cond}
+                    </Badge>
+                  ))}
+                </div>
+                {watch.years?.length > 0 && (
+                  <Card.Text className="text-muted small mb-1">
+                    Years: {watch.years.join(", ")}
+                  </Card.Text>
+                )}
+
+                {watch.colors?.length > 0 && (
+                  <Card.Text className="text-muted small mb-1">
+                    Colors: {watch.colors.join(", ")}
+                  </Card.Text>
+                )}
+
+                {watch.lastCreatedAt && (
+                  <Card.Text className="text-muted small mb-0">
+                    Last update:{" "}
+                    {new Date(watch.lastCreatedAt).toLocaleDateString()}
+                  </Card.Text>
+                )}
               </Card.Body>
             </Card>
           </Col>

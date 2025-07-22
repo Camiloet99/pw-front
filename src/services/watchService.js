@@ -73,3 +73,14 @@ export const autocompleteReference = async (prefix) => {
     throw err.response || err;
   }
 };
+
+// === 7. GET: Get summary of a watch reference (price range, conditions, etc.) ===
+export const getWatchSummaryByReference = async (reference) => {
+  try {
+    const res = await api.get(`/watches/summary/${reference}`);
+    return res.data?.result;
+  } catch (err) {
+    console.error("Error getting watch summary by reference:", err);
+    throw err.response || err;
+  }
+};

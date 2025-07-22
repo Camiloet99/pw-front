@@ -11,7 +11,7 @@ import {
   searchWatches,
   getWatchByReference,
 } from "../../services/watchService";
-import SearchResultsModal from "../../components/SearchResultsModal";
+import SearchResultsModal from "../../components/searchResultsModal/SearchResultsModal";
 import "./Search.css"; // Import your custom styles
 
 export default function Search() {
@@ -138,7 +138,6 @@ export default function Search() {
         fetchedResults = await getWatchByReference(filters.reference);
       }
       setTimeout(() => {
-        console.log("Holas");
         setShowModal(true);
         setResults(fetchedResults);
       }, 100);
