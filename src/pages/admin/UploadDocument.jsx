@@ -24,11 +24,11 @@ export default function UploadDocument() {
     }
 
     const formData = new FormData();
-    formData.append("document", file);
+    formData.append("file", file);
 
     setLoading(true);
     try {
-      await api.post("/admin/upload", formData, {
+      await api.post("/admin/documents/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

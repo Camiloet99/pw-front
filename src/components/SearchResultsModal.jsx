@@ -1,5 +1,12 @@
 import { useAuth } from "../contexts/AuthContext";
-import { Modal, Card, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+  Modal,
+  Card,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+  Badge,
+} from "react-bootstrap";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { addFavorite, removeFavoriteCall } from "../services/favoriteService";
 import { useState } from "react";
@@ -30,6 +37,19 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
     }
   };
 
+  const renderBadges = (items, variant) => {
+    if (!items) return null;
+    return items
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item, idx) => (
+        <Badge bg={variant} key={idx} className="me-1 text-capitalize">
+          {item}
+        </Badge>
+      ));
+  };
+
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton className="border-0 pb-0">
@@ -46,20 +66,38 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
               className="mb-3 shadow-sm border-0 rounded-3"
               style={{ background: "#f9f9f9" }}
             >
-              {console.log(watch)}
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-start">
                   <div>
                     <Card.Title className="fs-5 fw-bold mb-1">
                       {watch.referenceCode}
                     </Card.Title>
-                    <Card.Text className="text-muted small mb-2">
-                      {watch.year && `${watch.year} • `}
-                      {watch.condition} • {watch.colorDial}
+
+                    <Card.Text className="text-muted small mb-1">
+                      <strong>Production Year:</strong>{" "}
+                      {watch.productionYear || "Unknown"}
                     </Card.Text>
-                    <Card.Text className="text-muted small">
-                      Listed: {moment(watch.createdAt).format("MMM D, YYYY")}
+
+                    <Card.Text className="text-muted small mb-1">
+                      <strong>Listed:</strong>{" "}
+                      {watch.createdAt
+                        ? moment(watch.createdAt).format("MMM D, YYYY")
+                        : "Unknown"}
                     </Card.Text>
+
+                    {watch.condition && (
+                      <div className="mb-2">
+                        <strong>Condition:</strong>{" "}
+                        {renderBadges(watch.condition, "info")}
+                      </div>
+                    )}
+
+                    {watch.colorDial && (
+                      <div className="mb-2">
+                        <strong>Colors:</strong>{" "}
+                        {renderBadges(watch.colorDial, "dark")}
+                      </div>
+                    )}
                   </div>
 
                   <OverlayTrigger
@@ -88,8 +126,9 @@ export default function SearchResultsModal({ show, onHide, results = [] }) {
                   </OverlayTrigger>
                 </div>
 
-                <Card.Text className="fw-semibold fs-6 mt-1">
-                  Estimated Price: ${watch.cost?.toLocaleString()}
+                <Card.Text className="fw-semibold fs-6 mt-2">
+                  Estimated Price: ${watch.cost?.toLocaleString()}{" "}
+                  {watch.currency ? watch.currency.toUpperCase() : ""}
                 </Card.Text>
 
                 <div className="d-flex gap-2 mt-3">
