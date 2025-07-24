@@ -21,3 +21,8 @@
         transform: scale(1);
     }
 }
+
+.filter-row .form-select {
+    min-width: 100%;
+    margin-bottom: 10px;
+}

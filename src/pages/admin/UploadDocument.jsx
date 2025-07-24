@@ -33,10 +33,10 @@ export default function UploadDocument() {
           "Content-Type": "multipart/form-data",
         },
       });
-      toast.success("✅ File uploaded successfully.");
+      toast.success("File uploaded successfully.");
       setFile(null);
     } catch (error) {
-      toast.error("❌ Upload failed. Please try again.");
+      toast.error("Upload failed. Please try again.");
     } finally {
       setLoading(false);
     }

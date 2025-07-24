@@ -13,6 +13,13 @@ import {
 import { AiFillHeart } from "react-icons/ai";
 import "./FavoriteWatches.css";
 
+const formatBadge = (text) => {
+  if (!text) return "";
+  return text === text.toUpperCase()
+    ? text
+    : text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
+
 export default function FavoriteWatches() {
   const { favorites, removeFavorite } = useAuth();
   const [showConfirm, setShowConfirm] = useState(false);
@@ -68,25 +75,51 @@ export default function FavoriteWatches() {
                   {watch.maxPrice?.toLocaleString()}
                 </Card.Text>
 
-                <div className="mb-2">
-                  {watch.conditions?.map((cond, i) => (
-                    <Badge key={i} bg="secondary" className="me-1">
-                      {cond}
-                    </Badge>
-                  ))}
-                </div>
+                {/* Conditions */}
+                {watch.conditions?.length > 0 && (
+                  <div className="mb-2">
+                    {watch.conditions.map((cond, i) => (
+                      <Badge key={i} bg="secondary" className="me-1">
+                        {formatBadge(cond)}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Extra Info */}
+                {watch.extraInfo?.length > 0 && (
+                  <div className="mb-2">
+                    <span className="text-muted small me-2">Extra:</span>
+                    {watch.extraInfo.map((info, i) => (
+                      <Badge key={i} bg="warning" className="me-1 text-dark">
+                        {info.toUpperCase()}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Years */}
                 {watch.years?.length > 0 && (
                   <Card.Text className="text-muted small mb-1">
                     Years: {watch.years.join(", ")}
                   </Card.Text>
                 )}
 
+                {/* Colors */}
                 {watch.colors?.length > 0 && (
                   <Card.Text className="text-muted small mb-1">
                     Colors: {watch.colors.join(", ")}
                   </Card.Text>
                 )}
 
+                {/* Currencies */}
+                {watch.currencies?.length > 0 && (
+                  <Card.Text className="text-muted small mb-1">
+                    Currencies: {watch.currencies.join(", ")}
+                  </Card.Text>
+                )}
+
+                {/* Last updated */}
                 {watch.lastCreatedAt && (
                   <Card.Text className="text-muted small mb-0">
                     Last update:{" "}
@@ -99,6 +132,7 @@ export default function FavoriteWatches() {
         ))}
       </Row>
 
+      {/* Confirm removal modal */}
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Remove Favorite</Modal.Title>
